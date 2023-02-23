@@ -2,6 +2,15 @@ let socket = null
 let betSite = null
 let port = null
 
+function showNotification(message){
+  chrome.notifications.create(Date.now().toString(),{
+    type:"basic",
+    iconUrl: "images/icon.png",
+    title:"Chrome Lambo Slave",
+    message:message
+  });
+}
+
 function createConnection(){
   if(socket){
     socket.close();
@@ -42,13 +51,13 @@ function createConnection(){
       })
     });
     socket.addEventListener('error',(event)=>{
-      console.log(error);
+      showNotification(`Connection error: ${event.target.url}`);
       chrome.action.setBadgeText({
         "text":"OFF"
       });
     });
     socket.addEventListener('close',(event)=>{
-      console.log("closed!S");
+      showNotification(`Connection closed`);
       chrome.action.setBadgeText({
         "text":"OFF"
       });

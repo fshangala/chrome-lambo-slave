@@ -15,7 +15,7 @@ function createConnection(){
     "odds_input": 0,
     "stake_input": 1,
     "alt_stake_input": 0,
-    "betslip_buttons": ".BetPlacing__btn--place",
+    "betslip_buttons": ".DesktopBetPlacing-container .DesktopBetPlacing__bottomBtns-placeBet",
     "confirm_button": 0
   }
   chrome.storage.sync.get({

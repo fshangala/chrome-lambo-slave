@@ -3,6 +3,12 @@
   "name":"Chrome Lambo Slave",
   "description":"Chrome extension version of pc lambo slave software",
   "version":"1.0",
+  "icons":{
+    "16":"images/icon.png",
+    "32":"images/icon.png",
+    "48":"images/icon.png",
+    "128":"images/icon.png"
+  },
   "action":{
     "default_icon":"images/icon.png"
   },

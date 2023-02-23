@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chrome Lambo</title>
+    <link href="bootstrap/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container p-2">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Chrome Lambo</h5>
+          <form id="form">
+            <div class="mb-3">
+              <label for="host" class="form-label">Host</label>
+              <input id="host" type="text" placeholder="Host" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label for="port" class="form-label">Port</label>
+              <input id="port" type="number" placeholder="Port" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label for="code" class="form-label">Code</label>
+              <input id="code" type="text" placeholder="Code" class="form-control" required />
+            </div>
+            <hr>
+            <div class="mb-3">
+              <label for="betSite" class="form-label">Bet Site</label>
+              <textarea id="betSite" rows="10" class="form-control" required /></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="stake" class="form-label">Stake</label>
+              <input id="stake" type="number" placeholder="Stake" class="form-control" required />
+            </div>
+            <button id="saveBtn" class="btn btn-primary">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+    <script src="bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

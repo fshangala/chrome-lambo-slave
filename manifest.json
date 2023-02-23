@@ -1,0 +1,24 @@
+{
+  "manifest_version":3,
+  "name":"Chrome Lambo Slave",
+  "description":"Chrome extension version of pc lambo slave software",
+  "version":"1.0",
+  "action":{
+    "default_icon":"images/icon.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "background": {
+    "service_worker":"background.js"
+  },
+  "options_page":"options.html",
+  "content_scripts":[
+    {
+      "matches":["https://*/*"],
+      "js":["content-script.js"]
+    }
+  ]
+}

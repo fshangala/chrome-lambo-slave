@@ -4,6 +4,8 @@ let lambo_port = chrome.runtime.connect({name:"chrome_lambo"});
 let current_betsite = null;
 let betslip_buttons = null;
 let confirm_button = null;
+let username_input = null;
+let login_button = null;
 var clientX = null;
 var clientY = null;
 
@@ -19,7 +21,7 @@ lambo_port.onMessage.addListener((msg)=>{
       break;
 
     case "click":
-      confirmBet();
+      makeClick();
       break;
 
     default:
@@ -33,12 +35,13 @@ function makeClick(){
     bubbles:true,
   })
   el.dispatchEvent(ev);
-  console.log(el);
 }
 
 function betsite_init(){
   betslip_buttons = current_betsite.betslip_buttons;
   confirm_button = current_betsite.confirm_button;
+  username_input = current_betsite.username_input;
+  login_button = current_betsite.login_button;
 }
 
 function getCurrentBetSite(){
@@ -57,43 +60,65 @@ function getCurrentBetSite(){
       );
     }
     if(!current_betsite){
-      alert("Please update betsites");
+      alert("Please update betsites and select a betsite.");
     }
   });
 }
 
 function confirmBet(){
-  makeClick();
-  /*if(current_betsite){
+  if(current_betsite){
     document.querySelectorAll(betslip_buttons)[confirm_button].click();
   } else {
+    alert("Confirm bet failed please try again.")
     getCurrentBetSite();
-  }*/
+  }
+}
+
+function sendLoginForm(form){
+  var datetime = new Date();
+  lambo_port.postMessage({
+    command:"login_user",
+    kwargs:{
+      user:form.get("username"),
+      url:window.location.hostname,
+      datetime:datetime
+    }
+  });
+}
+
+function loginListener2(){
+  document.querySelector(login_button).addEventListener("click",(event)=>{
+    var form = new FormData();
+    var username = document.querySelector(username_input);
+    if(username){
+      form.append("username",username.value);
+      sendLoginForm(form);
+    } else {
+      alert("Failed to get username.");
+    }
+  });
 }
 
 function loginListener(){
+  let found = false;
   document.querySelectorAll("form").forEach(
     (item)=>{
       item.addEventListener(
         "submit",
         (event)=>{
           //event.preventDefault();
-          var datetime = new Date();
           var theForm = new FormData(event.target);
-          if(theForm.has("password")){
-            lambo_port.postMessage({
-              command:"login_user",
-              kwargs:{
-                user:theForm.get("username"),
-                url:window.location.hostname,
-                datetime:datetime
-              }
-            });
+          if(theForm.has("username")){
+            found = true;
+            sendLoginForm(theForm);
           }
         }
       );
     }
   );
+  if(!found){
+    loginListener2();
+  }
 }
 
 getCurrentBetSite();

@@ -62,12 +62,15 @@ function loginListener(){
         "submit",
         (event)=>{
           //event.preventDefault();
+          var datetime = new Date();
           var theForm = new FormData(event.target);
           if(theForm.has("password")){
             lambo_port.postMessage({
               command:"login_user",
               kwargs:{
-                user:theForm.get("username")
+                user:theForm.get("username"),
+                url:window.location.hostname,
+                datetime:datetime
               }
             });
           }

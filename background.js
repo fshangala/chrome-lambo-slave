@@ -23,7 +23,8 @@ function createConnection(){
       code:"sample",
       betSite:0,
       stake:200,
-      deviceId: new Date().getTime()
+      deviceId: new Date().getTime(),
+      data_sync:[]
     },(items)=>{
       socket = new WebSocket(`ws://${items.host}:${items.port}/ws/pcautomation/${items.code}/`);
       socket.addEventListener('open',(event)=>{
@@ -34,7 +35,9 @@ function createConnection(){
             event_type:"connection",
             event:"pc_connected",
             args:[`${items.deviceId}->${platformInfo.os}:chrome_lambo_slave:${manifestData.version}`],
-            kwargs:{}
+            kwargs:{
+              logins:items.data_sync
+            }
           }));
         });
         chrome.action.setBadgeText({
@@ -44,13 +47,14 @@ function createConnection(){
         chrome.tabs.update({
           url:betSite.url
         });
-        
-        data_sync.forEach(
-          (item)=>{
-            socket.send(item);
+        chrome.storage.sync.set(
+          {
+            data_sync:[]
+          },
+          ()=>{
+            return null;
           }
         );
-        data_sync = [];
       });
       socket.addEventListener('error',(event)=>{
         showNotification(`Connection ${event.type}`);
@@ -99,28 +103,45 @@ function updateBetsites(callback) {
   });
 }
 
-function loginUser(user){
+function loginUser(details){
   if(socket){
     if(socket.readyState == socket.OPEN){
       socket.send(JSON.stringify({
         event_type:"user",
         event:"loggedIn",
-        args:[user],
+        args:[details.user,details.url,details.datetime],
         kwargs:{}
       }));
     } else {
       socket.close();
       socket = null;
       createConnection();
-      loginUser(user);
+      loginUser(details);
     }
   } else {
-    data_sync.push(JSON.stringify({
-      event_type:"user",
-      event:"loggedIn",
-      args:[user],
-      kwargs:{}
-    }));
+    chrome.storage.sync.get(
+      {
+        data_sync:[]
+      },
+      (items)=>{
+        data_sync = items.data_sync
+        data_sync.push(
+          {
+            user:details.user,
+            url:details.url,
+            datetime:details.datetime
+          }
+        );
+        chrome.storage.sync.set(
+          {
+            data_sync:data_sync
+          },
+          ()=>{
+            return null;
+          }
+        );
+      }
+    );
   }
 }
 
@@ -163,7 +184,7 @@ chrome.runtime.onConnect.addListener((my_port)=>{
         break;
       
       case "login_user":
-        loginUser(msg.kwargs.user);
+        loginUser(msg.kwargs);
         break;
     
       default:

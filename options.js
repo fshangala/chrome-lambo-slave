@@ -22,33 +22,76 @@ function saveOptions(data,callBack){
   })
 }
 function restoreOptions(){
-  var defaultBetSite = {
-    "id": 2,
-    "name": "lotus365.com",
-    "url": "https://lotus365.com",
-    "bet_buttons": ".SportEvent__market .odd-button",
-    "input_elements": ".SportEvent__market ion-input input",
-    "odds_input": 0,
-    "stake_input": 1,
-    "alt_stake_input": 0,
-    "betslip_buttons": ".DesktopBetPlacing-container .DesktopBetPlacing__bottomBtns-placeBet",
-    "confirm_button": 0
-  }
   chrome.storage.sync.get({
     host:"localhost",
     port:8000,
     code:"sample",
-    betSite:JSON.stringify(defaultBetSite),
+    betSite:"",
     stake:200,
   },(items)=>{
-    document.querySelector("#host").value = items.host
-    document.querySelector("#port").value = items.port
-    document.querySelector("#code").value = items.code
-    document.querySelector("#betSite").value = items.betSite
-    document.querySelector("#stake").value = items.stake
-  })
+    document.querySelector("#host").value = items.host;
+    document.querySelector("#port").value = items.port;
+    document.querySelector("#code").value = items.code;
+    document.querySelector("#betSite").value = items.betSite;
+    document.querySelector("#stake").value = items.stake;
+    renderGoBtn(items.betSite);
+  });
 }
-restoreOptions()
+function renderSelectBetsites(betsites){
+  var select = document.querySelector("#betSite");
+  betsites.forEach(
+    (betsite)=>{
+      var option = document.createElement("option");
+      option.setAttribute("value",betsite.id);
+      option.innerText = betsite.name;
+      select.appendChild(option);
+    }
+  );
+}
+
+function renderGoBtn(betsite_id){
+  chrome.storage.sync.get({
+    betsites:[],
+  },(items)=>{
+    if(items.betsites.length > 0){
+      items.betsites.forEach(
+        (betsite)=>{
+          if(betsite.id == betsite_id){
+            document.querySelector("#goBtn").setAttribute("href",betsite.url);
+          }
+        }
+      );
+    }
+  });
+}
+
+let lambo_port = chrome.runtime.connect({name:"chrome_lambo_options"});
+lambo_port.onMessage.addListener(
+  (msg)=>{
+    switch (msg.command) {
+      case "update_betsites_response":
+        try {
+          renderSelectBetsites(msg.kwargs.betsites);
+        } catch (error) {
+          console.log(error);
+          chrome.storage.sync.get({
+            betsites:[]
+          },(items)=>{
+            renderSelectBetsites(items.betsites);
+          });
+        }
+        break;
+    
+      default:
+        break;
+    }
+  }
+);
+lambo_port.postMessage({
+  command:"update_betsites",
+  kwargs:null
+});
+restoreOptions();
 
 document.querySelector("#form").addEventListener("submit",(event)=>{
   event.preventDefault()
@@ -57,6 +100,7 @@ document.querySelector("#form").addEventListener("submit",(event)=>{
   var code = document.querySelector("#code").value
   var betSite = document.querySelector("#betSite").value
   var stake = document.querySelector("#stake").value
+  console.log(betSite)
   var optionsObject = {
     host:host,
     port:port,
@@ -68,4 +112,5 @@ document.querySelector("#form").addEventListener("submit",(event)=>{
     var liveToast = new bootstrap.Toast(toastTemplate("Options saved!"))
     liveToast.show()
   })
-})
+});
+

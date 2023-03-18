@@ -53,7 +53,6 @@ function createConnection(){
         data_sync = [];
       });
       socket.addEventListener('error',(event)=>{
-        console.log(event);
         showNotification(`Connection ${event.type}`);
         chrome.action.setBadgeText({
           "text":"OFF"
@@ -94,7 +93,7 @@ function updateBetsites(callback) {
       }
     ).catch(
       (error)=>{
-        callback(error);
+        callback(null);
       }
     );
   });

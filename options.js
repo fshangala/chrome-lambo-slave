@@ -26,7 +26,7 @@ function restoreOptions(){
     host:"localhost",
     port:8000,
     code:"sample",
-    betSite:"",
+    betSite:0,
     stake:200,
   },(items)=>{
     document.querySelector("#host").value = items.host;
@@ -74,15 +74,16 @@ lambo_port.onMessage.addListener(
   (msg)=>{
     switch (msg.command) {
       case "update_betsites_response":
-        try {
+        if(msg.kwargs.betsites){
           renderSelectBetsites(msg.kwargs.betsites);
-        } catch (error) {
-          console.log(error);
+        } else {
           chrome.storage.sync.get({
             betsites:[]
           },(items)=>{
             renderSelectBetsites(items.betsites);
           });
+          var liveToast = new bootstrap.Toast(toastTemplate("Failed to load betsites from the server. Loaded local betsites."));
+          liveToast.show();
         }
         break;
     

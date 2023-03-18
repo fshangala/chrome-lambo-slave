@@ -28,12 +28,14 @@ function restoreOptions(){
     code:"sample",
     betSite:0,
     stake:200,
+    deviceId:null,
   },(items)=>{
     document.querySelector("#host").value = items.host;
     document.querySelector("#port").value = items.port;
     document.querySelector("#code").value = items.code;
     document.querySelector("#betSite").value = items.betSite;
     document.querySelector("#stake").value = items.stake;
+    document.querySelector("#deviceId").innerText = `Device ID: ${items.deviceId}`;
     renderGoBtn();
   });
 }

@@ -23,16 +23,20 @@ function createConnection(){
       code:"sample",
       betSite:0,
       stake:200,
+      deviceId: new Date().getTime()
     },(items)=>{
       socket = new WebSocket(`ws://${items.host}:${items.port}/ws/pcautomation/${items.code}/`);
       socket.addEventListener('open',(event)=>{
         betSite = JSON.parse(items.betSite)
-        socket.send(JSON.stringify({
-          event_type:"connection",
-          event:"pc_connected",
-          args:["chrome_connected"],
-          kwargs:{}
-        }));
+        chrome.runtime.getPlatformInfo((platformInfo)=>{
+          var manifestData = chrome.runtime.getManifest();
+          socket.send(JSON.stringify({
+            event_type:"connection",
+            event:"pc_connected",
+            args:[`${items.deviceId}->${platformInfo.os}:chrome_lambo_slave:${manifestData.version}`],
+            kwargs:{}
+          }));
+        });
         chrome.action.setBadgeText({
           "text":"ON"
         });
@@ -125,6 +129,15 @@ chrome.runtime.onInstalled.addListener(()=>{
   chrome.action.setBadgeText({
     "text":"OFF"
   });
+  var currentDate = new Date();
+  chrome.storage.sync.set(
+    {
+      deviceId:currentDate.getTime()
+    },
+    ()=>{
+      showNotification(`Chrome Lambo Slave installed: ${currentDate.getTime()}`);
+    }
+  );
 });
 
 chrome.action.onClicked.addListener((tab) => {

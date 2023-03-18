@@ -11,7 +11,7 @@ function toastTemplate(message){
     `  ${message}`,
     '  </div>',
     '</div>'
-  ].join('')
+  ].join('');
   var div = document.createElement("div")
   div.innerHTML = toast.trim()
   return toastContainer.appendChild(div.firstChild)
@@ -34,7 +34,7 @@ function restoreOptions(){
     document.querySelector("#code").value = items.code;
     document.querySelector("#betSite").value = items.betSite;
     document.querySelector("#stake").value = items.stake;
-    renderGoBtn(items.betSite);
+    renderGoBtn();
   });
 }
 function renderSelectBetsites(betsites){
@@ -49,15 +49,19 @@ function renderSelectBetsites(betsites){
   );
 }
 
-function renderGoBtn(betsite_id){
+function renderGoBtn(){
   chrome.storage.sync.get({
-    betsites:[],
+    betSite:0,
+    betsites:[]
   },(items)=>{
     if(items.betsites.length > 0){
       items.betsites.forEach(
         (betsite)=>{
-          if(betsite.id == betsite_id){
-            document.querySelector("#goBtn").setAttribute("href",betsite.url);
+          if(betsite.id == items.betSite){
+            var goBtn = document.querySelector("#goBtn")
+            goBtn.setAttribute("href",betsite.url);
+            goBtn.innerText = `Go to ${betsite.name}`;
+            goBtn.classList.remove("disabled");
           }
         }
       );
@@ -93,18 +97,54 @@ lambo_port.postMessage({
 });
 restoreOptions();
 
+document.querySelectorAll("form").forEach(
+  (form)=>{
+    form.addEventListener(
+      "submit",
+      (event)=>{
+        event.preventDefault();
+        console.log(form.getAttribute("id"));
+        var theForm = new FormData(form);
+        switch (form.getAttribute("id")) {
+          case "connection-settings-form":
+            saveOptions(
+              {
+                host:theForm.get("host"),
+                port:theForm.get("port"),
+                code:theForm.get("code"),
+              },
+              ()=>{
+                window.location.reload();
+              }
+            );
+            break;
+          
+          case "betsite-settings-form":
+            saveOptions(
+              {
+                betSite:theForm.get("betSite"),
+                stake:theForm.get("stake")
+              },
+              ()=>{
+                var liveToast = new bootstrap.Toast(toastTemplate("Bet site settings saved!"));
+                liveToast.show();
+                renderGoBtn();
+              }
+            );
+        
+          default:
+            break;
+        }
+      }
+    );
+  }
+);
+/*
 document.querySelector("#form").addEventListener("submit",(event)=>{
   event.preventDefault()
-  var host = document.querySelector("#host").value
-  var port = document.querySelector("#port").value
-  var code = document.querySelector("#code").value
   var betSite = document.querySelector("#betSite").value
   var stake = document.querySelector("#stake").value
-  console.log(betSite)
   var optionsObject = {
-    host:host,
-    port:port,
-    code:code,
     betSite:betSite,
     stake:stake
   }
@@ -113,4 +153,4 @@ document.querySelector("#form").addEventListener("submit",(event)=>{
     liveToast.show()
   })
 });
-
+*/

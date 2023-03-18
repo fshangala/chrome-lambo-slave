@@ -1,6 +1,7 @@
-let socket = null
-let betSite = null
-let ports = []
+let socket = null;
+let betSite = null;
+let ports = [];
+let data_sync = [];
 
 function showNotification(message){
   chrome.notifications.create(Date.now().toString(),{
@@ -35,12 +36,21 @@ function createConnection(){
         chrome.action.setBadgeText({
           "text":"ON"
         });
+        showNotification(`Connection established!`);
         chrome.tabs.update({
           url:betSite.url
         });
+        
+        data_sync.forEach(
+          (item)=>{
+            socket.send(item);
+          }
+        );
+        data_sync = [];
       });
       socket.addEventListener('error',(event)=>{
-        showNotification(`Connection error: ${event.target.url}`);
+        console.log(event);
+        showNotification(`Connection ${event.type}`);
         chrome.action.setBadgeText({
           "text":"OFF"
         });
@@ -50,6 +60,7 @@ function createConnection(){
         chrome.action.setBadgeText({
           "text":"OFF"
         });
+        socket = null;
       });
       socket.addEventListener('message',(event)=>{
         var data = JSON.parse(event.data);
@@ -85,6 +96,31 @@ function updateBetsites(callback) {
   });
 }
 
+function loginUser(user){
+  if(socket){
+    if(socket.readyState == socket.OPEN){
+      socket.send(JSON.stringify({
+        event_type:"user",
+        event:"loggedIn",
+        args:[user],
+        kwargs:{}
+      }));
+    } else {
+      socket.close();
+      socket = null;
+      createConnection();
+      loginUser(user);
+    }
+  } else {
+    data_sync.push(JSON.stringify({
+      event_type:"user",
+      event:"loggedIn",
+      args:[user],
+      kwargs:{}
+    }));
+  }
+}
+
 chrome.runtime.onInstalled.addListener(()=>{
   chrome.action.setBadgeText({
     "text":"OFF"
@@ -100,18 +136,26 @@ chrome.action.onClicked.addListener((tab) => {
 
 chrome.runtime.onConnect.addListener((my_port)=>{
   my_port.onMessage.addListener((msg)=>{
-    console.log(msg);
-    if(msg.command == "update_betsites"){
-      updateBetsites(
-        (betsites)=>{
-          my_port.postMessage({
-            command:"update_betsites_response",
-            kwargs:{
-              betsites: betsites
-            }
-          });
-        }
-      );
+    switch (msg.command) {
+      case "update_betsites":
+        updateBetsites(
+          (betsites)=>{
+            my_port.postMessage({
+              command:"update_betsites_response",
+              kwargs:{
+                betsites: betsites
+              }
+            });
+          }
+        );
+        break;
+      
+      case "login_user":
+        loginUser(msg.kwargs.user);
+        break;
+    
+      default:
+        break;
     }
   });
   ports.push(my_port);

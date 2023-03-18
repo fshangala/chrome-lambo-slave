@@ -1,6 +1,6 @@
+console.log("Chrome Lambo Loaded!");
 let lambo_port = chrome.runtime.connect({name:"chrome_lambo"});
 
-let betSite = null;
 let current_betsite = null;
 let betslip_buttons = null;
 let confirm_button = null;
@@ -28,12 +28,13 @@ function betsite_init(){
 
 function getCurrentBetSite(){
   chrome.storage.sync.get({
+    betSite:0,
     betsites:[],
   },(items)=>{
     if(items.betsites.length > 0){
       items.betsites.forEach(
         (betsite)=>{
-          if(betsite.id == betsite_id){
+          if(betsite.id == items.betSite){
             current_betsite = betsite;
             betsite_init();
           }
@@ -47,7 +48,7 @@ function getCurrentBetSite(){
 }
 
 function confirmBet(){
-  if(betSite){
+  if(current_betsite){
     document.querySelectorAll(betslip_buttons)[confirm_button].click();
   } else {
     getCurrentBetSite();
@@ -55,22 +56,26 @@ function confirmBet(){
 }
 
 function loginListener(){
-  document.querySelectorAll("form").addEventListener(
-    "submit",
-    (event)=>{
-      event.preventDefault();
-      var theForm = new FormData(event.target);
-      if(theForm.has("password")){
-        alert(theForm.values());
-        lambo_port.postMessage({
-          command:"form_data",
-          kwargs:{
-            values:theForm.values()
+  document.querySelectorAll("form").forEach(
+    (item)=>{
+      item.addEventListener(
+        "submit",
+        (event)=>{
+          //event.preventDefault();
+          var theForm = new FormData(event.target);
+          if(theForm.has("password")){
+            lambo_port.postMessage({
+              command:"login_user",
+              kwargs:{
+                user:theForm.get("username")
+              }
+            });
           }
-        });
-      }
+        }
+      );
     }
   );
 }
 
 getCurrentBetSite();
+loginListener();

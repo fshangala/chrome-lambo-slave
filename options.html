@@ -11,35 +11,49 @@
       <div class="card shadow">
         <div class="card-body">
           <h5 class="card-title">Chrome Lambo</h5>
-          <form id="form">
-            <div class="mb-3">
-              <label for="host" class="form-label">Host</label>
-              <input id="host" type="text" placeholder="Host" class="form-control" required />
+          <div class="mb-3">
+            <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#connection-settings" aria-expanded="false" aria-controls="connection-settings">Connection settings</button>
+            <div class="collapse border p-4" id="connection-settings">
+              <form id="connection-settings-form">
+                <div class="mb-3">
+                  <label for="host" class="form-label">Host</label>
+                  <input id="host" name="host" type="text" placeholder="Host" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                  <label for="port" class="form-label">Port</label>
+                  <input id="port" name="port" type="number" placeholder="Port" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                  <label for="code" class="form-label">Code</label>
+                  <input id="code" name="code" type="text" placeholder="Code" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                  <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+              </form>
             </div>
-            <div class="mb-3">
-              <label for="port" class="form-label">Port</label>
-              <input id="port" type="number" placeholder="Port" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#betsite-settings" aria-expanded="false" aria-controls="betsite-settings">Bet site settings</button>
+            <div class="collapse border p-4" id="betsite-settings">
+              <form id="betsite-settings-form">
+                <div class="mb-3">
+                  <label for="betSite" class="form-label">Bet Site</label>
+                  <select id="betSite" name="betSite" class="form-control"></select>
+                </div>
+                <div class="mb-3">
+                  <label for="stake" class="form-label">Stake</label>
+                  <input id="stake" name="stake" type="number" placeholder="Stake" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                  <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+              </form>
             </div>
-            <div class="mb-3">
-              <label for="code" class="form-label">Code</label>
-              <input id="code" type="text" placeholder="Code" class="form-control" required />
-            </div>
-            <hr>
-            <div class="mb-3">
-              <label for="betSite" class="form-label">Bet Site</label>
-              <select id="betSite" class="form-control"></select>
-            </div>
-            <div class="mb-3">
-              <label for="stake" class="form-label">Stake</label>
-              <input id="stake" type="number" placeholder="Stake" class="form-control" required />
-            </div>
-            <div class="mb-3">
-              <button id="saveBtn" class="btn btn-primary">Save</button>
-            </div>
-            <div class="mb-3">
-              <a id="goBtn" class="btn btn-outline-primary">GO</a>
-            </div>
-          </form>
+          </div>
+          <div class="mb-3">
+            <a id="goBtn" class="btn btn-outline-primary disabled">GO</a>
+          </div>
         </div>
       </div>
     </div>

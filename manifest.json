@@ -25,7 +25,7 @@
   "options_page":"options.html",
   "content_scripts":[
     {
-      "matches":["https://*/*"],
+      "matches":["*://*/*"],
       "js":["content-script.js"]
     }
   ]

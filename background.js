@@ -74,7 +74,11 @@ function createConnection(){
         if(ports.length > 0){
           ports.forEach(
             (port) => {
-              port.postMessage(data);
+              try {
+                port.postMessage(data);
+              } catch (error) {
+                console.log(error);
+              }
             }
           );
         }

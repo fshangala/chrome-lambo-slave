@@ -4,9 +4,15 @@ let lambo_port = chrome.runtime.connect({name:"chrome_lambo"});
 let current_betsite = null;
 let betslip_buttons = null;
 let confirm_button = null;
+var clientX = null;
+var clientY = null;
+
+document.body.addEventListener("mousemove",(e)=>{
+  window.clientX = e.clientX;
+  window.clientY = e.clientY;
+});
 
 lambo_port.onMessage.addListener((msg)=>{
-  console.log(msg)
   switch (msg.event) {
     case "confirm_bet":
       confirmBet();
@@ -20,6 +26,15 @@ lambo_port.onMessage.addListener((msg)=>{
       break;
   }
 });
+
+function makeClick(){
+  var el = document.elementFromPoint(clientX,clientY);
+  var ev = new Event("click",{
+    bubbles:true,
+  })
+  el.dispatchEvent(ev);
+  console.log(el);
+}
 
 function betsite_init(){
   betslip_buttons = current_betsite.betslip_buttons;
@@ -48,11 +63,12 @@ function getCurrentBetSite(){
 }
 
 function confirmBet(){
-  if(current_betsite){
+  makeClick();
+  /*if(current_betsite){
     document.querySelectorAll(betslip_buttons)[confirm_button].click();
   } else {
     getCurrentBetSite();
-  }
+  }*/
 }
 
 function loginListener(){

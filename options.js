@@ -91,6 +91,11 @@ function renderGoBtn(){
   });
 }
 
+function renderVersion(){
+  var manifestData = chrome.runtime.getManifest();
+  document.querySelector("#version-badge").innerText = `v${manifestData.version}`;
+}
+
 let lambo_port = chrome.runtime.connect({name:"chrome_lambo_options"});
 lambo_port.onMessage.addListener(
   (msg)=>{
@@ -163,6 +168,7 @@ document.querySelectorAll("form").forEach(
   }
 );
 
+renderVersion();
 checkUpdate();
 /*
 document.querySelector("#form").addEventListener("submit",(event)=>{

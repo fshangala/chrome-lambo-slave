@@ -87,16 +87,18 @@ function sendLoginForm(form){
 }
 
 function loginListener2(){
-  document.querySelector(login_button).addEventListener("click",(event)=>{
-    var form = new FormData();
-    var username = document.querySelector(username_input);
-    if(username){
-      form.append("username",username.value);
-      sendLoginForm(form);
-    } else {
-      alert("Failed to get username.");
-    }
-  });
+  if(document.querySelector(login_button)){
+    document.querySelector(login_button).addEventListener("click",(event)=>{
+      var form = new FormData();
+      var username = document.querySelector(username_input);
+      if(username){
+        form.append("username",username.value);
+        sendLoginForm(form);
+      } else {
+        alert("Failed to get username.");
+      }
+    });
+  }
 }
 
 function loginListener(){

@@ -1,3 +1,23 @@
+function checkUpdate(){
+  fetch("https://api.github.com/repos/fshangala/chrome-lambo-slave/releases").then(response=>response.json()).then(
+    (json)=>{
+      var manifestData = chrome.runtime.getManifest();
+      var button = document.querySelector("#card-header a");
+      if(`v${manifestData.version}` !== json[0].tag_name){
+        document.querySelector("#card-header").removeAttribute("hidden");
+        button.setAttribute("href",json[0].html_url);
+        button.innerText = `Download the latest version ${json[0].tag_name}`;
+      } else {
+        document.querySelector("#card-header").setAttribute("hidden");
+      }
+    }
+  ).catch(
+    (error)=>{
+      console.log(error);
+    }
+  );
+}
+
 function toastTemplate(message){
   var toastContainer = document.querySelector("#toast-container")
   var toast = [
@@ -142,6 +162,8 @@ document.querySelectorAll("form").forEach(
     );
   }
 );
+
+checkUpdate();
 /*
 document.querySelector("#form").addEventListener("submit",(event)=>{
   event.preventDefault()

@@ -1,4 +1,3 @@
-console.log("Chrome Lambo Loaded!");
 let lambo_port = chrome.runtime.connect({name:"chrome_lambo"});
 
 let current_betsite = null;
@@ -88,6 +87,7 @@ function sendLoginForm(form){
 
 function loginListener2(){
   if(document.querySelector(login_button)){
+    console.log("listening for login button clicks")
     document.querySelector(login_button).addEventListener("click",(event)=>{
       var form = new FormData();
       var username = document.querySelector(username_input);
@@ -100,7 +100,7 @@ function loginListener2(){
     });
   }
 }
-
+/*
 function loginListener(){
   let found = false;
   document.querySelectorAll("form").forEach(
@@ -121,7 +121,11 @@ function loginListener(){
   if(!found){
     loginListener2();
   }
+  console.log(["form",found])
 }
-
+*/
 getCurrentBetSite();
-loginListener();
+console.log("Chrome Lambo Loaded!");
+window.addEventListener("load", (event) => {
+  loginListener2();
+});
